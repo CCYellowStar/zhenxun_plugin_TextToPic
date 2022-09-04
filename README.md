@@ -1,0 +1,2 @@
+# zhenxun_plugin_TextToPic
+使用wenxinApi以文字描述生成各种风格图片的真寻插件
