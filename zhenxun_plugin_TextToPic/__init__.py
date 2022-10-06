@@ -16,13 +16,15 @@ __plugin_usage__ = """
 usage：
     用图片描述+图片风格生成图片
     指令：
-        以文生图 图片风格 图片描述
+        以文生图 图片风格 图片尺寸(非必填，默认方图) 图片描述
         
-风格可以是：油画、水彩、卡通、粉笔画、儿童画、蜡笔画
+图片描述请不要带空格！      
+风格可以是：油画、水彩、二次元、粉笔画、儿童画、蜡笔画、古风、像素风格、蒸汽波艺术、赛博朋克、概念艺术、未来主义、写实风格、超现实主义
+尺寸可以是：方图(默认)、长图、横图
 """.strip()
 __plugin_des__ = "用图片风格+图片描述生成图片"
 __plugin_cmd__ = ["以文生图/生成图片"]
-__plugin_version__ = 1.0
+__plugin_version__ = 1.2
 __plugin_author__ = "CCYellowStar"
 __plugin_settings__ = {
     "level": 5,
@@ -55,18 +57,34 @@ async def _(bot: Bot, event: MessageEvent, state: T_State, msg: Message = Comman
     if not wenxin_api.sk:
         await pic.finish("以文生图的sk_api缺失，在https://wenxin.baidu.com/moduleApi/key 获取生成")
     if len(msg) < 2:
-        await pic.finish("请输入正确的格式：以文生图 图片风格 图片描述\n风格可以是：油画、水彩、卡通、粉笔画、儿童画、蜡笔画")
-    text = msg[1]
-    style = msg[0]
-    await get_img(text, style, pic, bot, event)
+        await pic.finish("请输入正确的格式：以文生图 图片风格 图片尺寸(非必填，可以是方图，长图，横图) 图片描述\n风格可以是：油画、水彩、卡通、粉笔画、儿童画、蜡笔画")
+    if len(msg) == 3:
+        text = msg[2]
+        style = msg[0]
+        if msg[1] =="方图":           
+            resolution = "1024*1024"
+        elif msg[1] =="长图":           
+            resolution = "1024*1536"
+        elif msg[1] =="横图":           
+            resolution = "1536*1024"
+        else:
+            await pic.finish("请输入正确的尺寸：如方图、长图、横图，或者图片描述请不要带空格！")
+    elif len(msg) == 2:
+        text = msg[1]
+        style = msg[0]
+        resolution = "1024*1024"
+    elif len(msg) > 3:
+        await pic.finish("图片描述请不要带空格！")
+    await get_img(text, style, resolution, pic, bot, event)
 
 
 async def get_img(
-text: str, style: str, matcher: Type[Matcher], bot: Bot, event: MessageEvent
+text: str, style: str,resolution: str, matcher: Type[Matcher], bot: Bot, event: MessageEvent
 ):
     input_dict = {
     "text": text,
-    "style": style
+    "style": style,
+    "resolution": resolution
     }
     try:
         await matcher.send("开始生成图片...")
