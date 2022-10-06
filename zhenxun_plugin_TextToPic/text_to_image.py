@@ -23,8 +23,9 @@ class TextToImage(Task):
         timeout = params.pop("timeout", None)
         text = params.pop("text", "")
         style = params.pop("style", "")
+        resolution = params.pop("resolution", "")
         http_requestor = requestor.HTTPRequestor()
-        resp = http_requestor.request(create_url, text=text, style=style, return_raw=True)
+        resp = http_requestor.request(create_url, text=text, style=style, resolution=resolution, return_raw=True)
         try:
             task_id = resp.json()["data"]["taskId"]
         except Exception as e:
